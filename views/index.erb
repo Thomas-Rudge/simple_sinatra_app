@@ -1,12 +1,22 @@
 <html>
   <head></head>
+  <link rel="stylesheet" href="<%= url("/style.css")%>"/>
   <body>
     <p>
       <%= message %>
     </p>
-    <form>
-      <input type='text' name='guess' />
-      <input type='submit' value='Guess!' />
-    </form>
+    <div>
+      <form>
+        <input type='text' name='guess' />
+        <input type='submit' value='Guess!' />
+      </form>
+      <form>
+        <input type="hidden" name="retry" value=true>
+        <input type='submit' value='Retry?' />
+      </form>
+      <p>
+        <%= cheat %>
+      </p>
+    </div>
   </body>
 </html>

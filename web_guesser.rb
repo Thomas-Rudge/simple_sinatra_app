@@ -1,34 +1,33 @@
 require 'sinatra'
 require 'sinatra/reloader'
+require_relative 'lib/game_logic.rb'
 
-number = rand(1..100)
+set :number , 0
+
+def reset
+  settings.number = rand(1..100)
+  @@count   = 6
+  @@correct = false
+end
+
+reset
 
 get '/' do
-  guess = params["guess"]
-  message = check_guess(guess, number)
-  erb :index, :locals => { :number=>number, :message=>message }
-end
+  @@count -= 1
 
-def check_guess(guess, number)
-  message = "I am thinking of a number between 1 and 100.<br />Can you guess what it is?"
-  unless guess.nil?
-    if (guess =~ /^\d{1,3}/) && (guess.to_i.between? 1, 100)
-      message = case number - guess.to_i
-                when 0           then "That's right! I was thinking of #{number}."
-                when (-100..-31) then "Way too high. Try again."
-                when (-30..-21)  then "Too high. Try again."
-                when (-20..-10)  then "Just a bit too high. Try again."
-                when (-9..0)     then "Really close! Just a bit lower"
-                when (0..9)      then "Really close! Just a bit higher."
-                when (10..20)    then "Just a bit too low. Try again."
-                when (21..30)    then "Too low. Try again."
-                when (31..100)   then "Way too low. Try again."
-                else "Woops"
-                end
-    else
-      message = "It has to be a number between 1 and 100."
-    end
+  guess = params["guess"]
+  cheat = params["cheat"]
+
+  if params["retry"] == "true" || @@count < 0
+    reset
+    redirect "/"
   end
 
-  message
+  cheat = cheat ? settings.number : ""
+
+  message = check_guess(guess, settings.number, @@count)
+
+  erb :index, :locals => { :number=>settings.number, :message=>message, :cheat=>cheat }
 end
+
+
